@@ -1333,10 +1333,40 @@
     els.install.hidden = true;
   });
 
+  // Installing the app to a home screen means it can sit resumed in memory for
+  // days without ever re-fetching, so a deploy would never arrive on its own.
+  // Three things make it land:
+  //
+  //   updateViaCache: "none" — check sw.js against the server, not the HTTP
+  //     cache. GitHub Pages sends max-age on it, so the browser would otherwise
+  //     not notice a new worker for as long as that lasts.
+  //   update() on every load — ask, rather than wait for the browser to decide.
+  //   controllerchange — a new worker calling clients.claim() means the shell on
+  //     screen is already stale, so reload once to pick it up.
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () =>
-      navigator.serviceWorker.register("sw.js").catch(() => {})
-    );
+    window.addEventListener("load", async () => {
+      const hadController = Boolean(navigator.serviceWorker.controller);
+      let reloading = false;
+
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        // On a first-ever install there's nothing stale to replace — claiming
+        // control isn't an update, and reloading for it looks like a glitch.
+        if (!hadController || reloading) return;
+        // Never yank the page out from under an unsaved edit. The cache keeps
+        // the work either way; this just avoids a jarring reload mid-sentence,
+        // and the next natural load will pick the new version up.
+        if (dirty) return;
+        reloading = true;
+        location.reload();
+      });
+
+      try {
+        const reg = await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+        reg.update();
+      } catch {
+        /* offline, or an origin that won't allow a worker — the app still runs */
+      }
+    });
   }
 
   boot();
