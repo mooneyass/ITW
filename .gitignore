@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+node_modules/
+
+# Per-machine Claude Code permissions, not project config
+.claude/settings.local.json

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I'm the Warranty</title>
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16181c" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="topbar">
+  <header class="bar">
+    <button id="back-btn" class="back" type="button" aria-label="All vehicles" hidden></button>
+    <h1>I'm the Warranty</h1>
+    <span id="status" class="status"></span>
+    <button id="install-btn" class="primary" type="button" hidden>Install</button>
+    <button id="account-btn" class="ghost" type="button" hidden>Sign out</button>
+  </header>
+</div>
+
+<main>
+  <!-- Shown until we have a Google access token -->
+  <section id="signin" class="card" hidden>
+    <h2>Sign in to Google</h2>
+    <p class="muted">
+      Your vehicles are stored as <code>vehicledata/vehicles.json</code> in your Google Drive,
+      with the photos alongside it in <code>vehicledata/photos</code>. This app uses Drive's
+      restricted <code>drive.file</code> permission, so it can only ever see the folder it
+      created &mdash; nothing else in your Drive.
+    </p>
+    <button id="signin-btn" class="primary" type="button">Sign in with Google</button>
+    <p id="signin-error" class="error" hidden></p>
+    <p id="origin-hint" class="muted" hidden></p>
+  </section>
+
+  <!-- Shown when config.js has no client ID yet -->
+  <section id="setup" class="card" hidden>
+    <h2>Setup needed</h2>
+    <p class="muted">
+      Open <code>config.js</code> and paste your Google OAuth client ID into
+      <code>GOOGLE_CLIENT_ID</code>. Step-by-step instructions are in <code>README.md</code>.
+    </p>
+  </section>
+
+  <!-- Landing screen: every vehicle as a photo tile -->
+  <section id="grid-screen" hidden>
+    <h2 id="grid-title" class="screen-title" hidden>Sold</h2>
+    <div id="grid" class="grid"></div>
+    <p id="grid-empty" class="muted empty" hidden></p>
+    <button id="sold-toggle" class="ghost wide" type="button" hidden></button>
+  </section>
+
+  <!-- One vehicle: header, running costs, then its service log newest first -->
+  <section id="vehicle-screen" hidden>
+    <div class="vhead">
+      <button id="v-photo-btn" class="vphoto" type="button" aria-label="View photo"></button>
+      <div class="vhead-text">
+        <h2 id="v-name"></h2>
+        <p id="v-sold-flag" class="sold-flag" hidden></p>
+      </div>
+    </div>
+
+    <div id="v-breakdown" class="breakdown"></div>
+
+    <div class="vactions">
+      <button id="v-edit" class="ghost" type="button">Edit</button>
+      <button id="v-sold-btn" class="danger" type="button">Sold</button>
+    </div>
+
+    <button id="add-record" class="add" type="button">+ Add record</button>
+    <ul id="records" class="list"></ul>
+    <p id="records-empty" class="muted empty" hidden>Nothing logged yet.</p>
+  </section>
+</main>
+
+<!-- Add / edit a vehicle. Same form both ways; the heading and button change. -->
+<dialog id="vehicle-dlg">
+  <h2 id="vehicle-dlg-title">Add a vehicle</h2>
+
+  <div class="photo-pick">
+    <button id="pick-photo" class="photo-drop" type="button" aria-label="Choose a photo"></button>
+    <div class="photo-pick-text">
+      <button id="pick-photo-btn" class="ghost" type="button">Choose photo</button>
+      <button id="clear-photo" class="ghost" type="button" hidden>Remove</button>
+      <p id="photo-busy" class="muted tiny" hidden>Preparing photo&hellip;</p>
+      <p id="photo-hint" class="muted tiny">Resized on this device before it's uploaded.</p>
+    </div>
+  </div>
+  <!-- accept=image/* is what makes Android offer the camera as well as the gallery -->
+  <input id="photo-file" type="file" accept="image/*" hidden>
+
+  <div class="form-grid">
+    <label class="field span2">
+      <span>Year</span>
+      <input id="f-year" type="number" inputmode="numeric" min="1885" max="2100" placeholder="2019">
+    </label>
+    <label class="field span2">
+      <span>Make</span>
+      <input id="f-make" type="text" placeholder="Toyota" maxlength="40">
+    </label>
+    <label class="field span4">
+      <span>Model</span>
+      <input id="f-model" type="text" placeholder="Tacoma" maxlength="60">
+    </label>
+  </div>
+
+  <p id="vehicle-dlg-error" class="error" hidden></p>
+
+  <div class="dlg-actions">
+    <button id="vehicle-cancel" class="ghost" type="button">Cancel</button>
+    <button id="vehicle-save" class="primary" type="button">Add vehicle</button>
+  </div>
+</dialog>
+
+<dialog id="sold-dlg">
+  <h2>Sold it?</h2>
+  <p id="sold-what" class="muted"></p>
+  <div class="dlg-actions">
+    <button id="sold-cancel" class="ghost" type="button">Cancel</button>
+    <button id="sold-confirm" class="danger" type="button">Mark as sold</button>
+  </div>
+</dialog>
+
+<dialog id="delete-dlg">
+  <h2>Delete this record?</h2>
+  <p id="delete-what" class="muted"></p>
+  <div class="dlg-actions">
+    <button id="delete-cancel" class="ghost" type="button">Cancel</button>
+    <button id="delete-confirm" class="danger" type="button">Delete</button>
+  </div>
+</dialog>
+
+<dialog id="conflict-dlg">
+  <h2>This changed somewhere else</h2>
+  <p class="muted">
+    Another device saved <code>vehicles.json</code> after this one loaded it.
+    Keeping both versions isn't possible &mdash; pick one.
+  </p>
+  <div class="dlg-actions">
+    <button id="conflict-theirs" class="primary" type="button">Load the other version</button>
+    <button id="conflict-mine" class="danger" type="button">Overwrite with mine</button>
+  </div>
+</dialog>
+
+<dialog id="photo-dlg" class="lightbox">
+  <img id="photo-big" alt="">
+  <button id="photo-close" class="ghost" type="button">Close</button>
+</dialog>
+
+<script src="config.js"></script>
+<!-- Inert unless the URL has ?mock=1. See dev/mock.js. -->
+<script src="dev/mock.js"></script>
+<script src="drive.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
