@@ -84,15 +84,22 @@
 
   <div class="photo-pick">
     <button id="pick-photo" class="photo-drop" type="button" aria-label="Choose a photo"></button>
-    <div class="photo-pick-text">
+    <div class="photo-pick-actions">
+      <button id="camera-btn" class="ghost" type="button" hidden>Take photo</button>
       <button id="pick-photo-btn" class="ghost" type="button">Choose photo</button>
       <button id="clear-photo" class="ghost" type="button" hidden>Remove</button>
-      <p id="photo-busy" class="muted tiny" hidden>Preparing photo&hellip;</p>
-      <p id="photo-hint" class="muted tiny">Resized on this device before it's uploaded.</p>
     </div>
   </div>
-  <!-- accept=image/* is what makes Android offer the camera as well as the gallery -->
+  <p id="photo-busy" class="muted tiny" hidden>Preparing photo&hellip;</p>
+  <p id="photo-hint" class="muted tiny">Resized on this device before it's uploaded.</p>
+
+  <!-- Two inputs, deliberately. capture= doesn't add the camera to the picker,
+       it replaces the picker with the camera — so it can't go on the input that
+       browses the library. Android 13+ hands accept=image/* to the system Photo
+       Picker, which offers no camera at all, making the second input the only
+       way to shoot one. -->
   <input id="photo-file" type="file" accept="image/*" hidden>
+  <input id="photo-camera" type="file" accept="image/*" capture="environment" hidden>
 
   <div class="form-grid">
     <label class="field span2">

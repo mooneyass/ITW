@@ -60,6 +60,8 @@
     photoBusy: $("photo-busy"),
     photoHint: $("photo-hint"),
     photoFile: $("photo-file"),
+    photoCamera: $("photo-camera"),
+    cameraBtn: $("camera-btn"),
     fYear: $("f-year"),
     fMake: $("f-make"),
     fModel: $("f-model"),
@@ -1245,11 +1247,22 @@
 
   els.pickPhoto.addEventListener("click", () => els.photoFile.click());
   $("pick-photo-btn").addEventListener("click", () => els.photoFile.click());
+  els.cameraBtn.addEventListener("click", () => els.photoCamera.click());
 
-  els.photoFile.addEventListener("change", () => {
-    onPhotoPicked(els.photoFile.files?.[0]);
-    els.photoFile.value = ""; // so picking the same file twice still fires
-  });
+  // Both inputs land here — a camera capture and a library pick arrive as the
+  // same kind of File, so nothing downstream needs to know which it was.
+  for (const input of [els.photoFile, els.photoCamera]) {
+    input.addEventListener("change", () => {
+      onPhotoPicked(input.files?.[0]);
+      input.value = ""; // so picking the same file twice still fires
+    });
+  }
+
+  // capture= is honoured on phones and tablets and ignored on desktop, where the
+  // button would just open a second file dialog identical to the first. Keyed on
+  // the primary pointer rather than on whether a camera exists, because a laptop
+  // webcam is exactly the case where the attribute does nothing.
+  if (matchMedia("(pointer: coarse)").matches) els.cameraBtn.hidden = false;
 
   els.clearPhoto.addEventListener("click", () => {
     dlgPhoto = null;

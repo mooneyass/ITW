@@ -1,6 +1,6 @@
 // Offline shell. Bump CACHE when you change any of the shell files so old
 // copies get evicted.
-const CACHE = "itw-shell-v2";
+const CACHE = "itw-shell-v3";
 
 const SHELL = [
   "./",

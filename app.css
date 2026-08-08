@@ -466,7 +466,7 @@ dialog h2 { margin: 0 0 12px; font-size: 17px; }
   margin-top: 16px;
 }
 
-.photo-pick { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.photo-pick { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
 
 /* Same 16:9 as everywhere else, so what you see when you pick is what the grid
    will show. */
@@ -486,8 +486,17 @@ dialog h2 { margin: 0 0 12px; font-size: 17px; }
 .photo-drop img { object-fit: cover; }
 .photo-drop .thumb-ph { aspect-ratio: auto; }
 
-.photo-pick-text { min-width: 0; flex: 1; }
-.photo-pick-text button { min-height: 38px; font-size: 14px; }
+/* Stacked, not side by side: at dialog width the column is ~155px, and two
+   buttons across that squeezes "Choose photo" onto two lines. */
+.photo-pick-actions {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.photo-pick-actions button { width: 100%; min-height: 38px; font-size: 14px; }
 
 dialog.lightbox {
   max-width: min(96vw, 900px);

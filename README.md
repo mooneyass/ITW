@@ -11,8 +11,8 @@ in your own Google Drive, so Windows and Android read and write the same log.
   fields become editable and a notes box appears, sizing itself to fit however much you
   write and shrinking back as you delete. The date is a proper date picker, so back-filling
   a service from 2019 is a normal thing to do, not a fight.
-- **Photos** are picked from the camera or the gallery and resized on the device before
-  they're uploaded. Tap the photo on a vehicle page to see it full size.
+- **Photos** come from **Take photo** or **Choose photo**, and are resized on the device
+  before they're uploaded. Tap the photo on a vehicle page to see it full size.
 - **"Sold" doesn't delete.** The vehicle leaves the grid but keeps its photo, its records
   and its totals, and you'll find it under **Sold** — with a **Back in the Garage** button
   if you sell it to a friend and buy it back. Individual records *do* delete; a typo isn't
@@ -169,6 +169,15 @@ and uploads itself when the connection returns.
 
 Replacing a photo bumps its revision, so the other device knows its cached copy is stale
 without comparing bytes, and the superseded files are removed from Drive.
+
+**Why there are two photo buttons.** They're backed by two separate file inputs. The
+`capture` attribute doesn't add a camera option to the picker — it *replaces* the picker
+with the camera — so it can't go on the input that browses the library. And it has to
+exist, because Android 13 and later hand an `accept="image/*"` input to the system Photo
+Picker, which offers no camera at all. **Take photo** is hidden on desktop, where
+`capture` is ignored and the two buttons would do the same thing; the test is
+`(pointer: coarse)` rather than whether a camera exists, since a laptop webcam is
+precisely the case where the attribute does nothing.
 
 **One iPhone caveat:** photos come off an iPhone as HEIC. Safari can decode those, so
 picking one *on the phone* works fine — it's converted to JPEG before upload. Dropping a raw
