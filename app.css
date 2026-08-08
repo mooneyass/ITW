@@ -466,13 +466,18 @@ dialog h2 { margin: 0 0 12px; font-size: 17px; }
   margin-top: 16px;
 }
 
-.photo-pick { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+/* The buttons stretch to the height of the preview and divide it between them,
+   so the two columns end flush. The preview drives the height; the button
+   column follows. */
+.photo-pick { display: flex; align-items: stretch; gap: 10px; margin-bottom: 10px; }
 
 /* Same 16:9 as everywhere else, so what you see when you pick is what the grid
    will show. */
+/* Wider than it needs to be for its own sake: the preview sets the height the
+   three buttons share, and at the old 136px they'd have been 22px each. */
 .photo-drop {
   flex: none;
-  width: 136px;
+  width: min(62%, 210px);
   aspect-ratio: 16 / 9;
   min-height: 0;
   padding: 0;
@@ -486,17 +491,26 @@ dialog h2 { margin: 0 0 12px; font-size: 17px; }
 .photo-drop img { object-fit: cover; }
 .photo-drop .thumb-ph { aspect-ratio: auto; }
 
-/* Stacked, not side by side: at dialog width the column is ~155px, and two
-   buttons across that squeezes "Choose photo" onto two lines. */
+/* auto-rows rather than a fixed three, so that when Remove is hidden the two
+   that are left still divide the full height instead of leaving a gap under
+   them. Every button gets the same 1fr row, hence the same width and height. */
 .photo-pick-actions {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: 5px;
 }
 
-.photo-pick-actions button { width: 100%; min-height: 38px; font-size: 14px; }
+/* min-height has to be beaten down from the global 44px tap target, or the
+   three of them would overflow the preview's height rather than fit inside it. */
+.photo-pick-actions button {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0 6px;
+  font-size: 13px;
+}
 
 dialog.lightbox {
   max-width: min(96vw, 900px);
