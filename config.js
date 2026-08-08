@@ -15,8 +15,14 @@ window.ITW_CONFIG = {
   // The service type dropdown. The first one is the default for a new record.
   SERVICE_TYPES: ["Service", "Repair", "Maintenance", "Upgrade"],
 
-  // Used for cost formatting only — nothing is converted.
-  CURRENCY: "USD",
+  // Cost formatting. A bare symbol rather than a currency code, so it always
+  // reads "$89" — Intl's currency mode would render CAD as "CA$89" or "US$89"
+  // depending on the machine's locale, which is not what you want on your own
+  // maintenance log.
+  CURRENCY_SYMBOL: "$",
+
+  // Shown after odometer readings. Grouping still follows the local format.
+  DISTANCE_UNIT: "km",
 
   // Photos are resized on the device that picked them, before upload. The thumb
   // is what the grid and the vehicle header show; the full size is fetched only

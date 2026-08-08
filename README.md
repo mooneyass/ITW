@@ -7,7 +7,7 @@ in your own Google Drive, so Windows and Android read and write the same log.
   model — three across on a phone, more on a wider screen. Tap one to open it.
 - **A vehicle page** leads with its photo and name, then what it has cost you: a lifetime
   total, broken down into Service, Repair, Maintenance and Upgrade.
-- **Records are date, mileage, type and cost**, newest first. Tap a row to open it — the
+- **Records are date, odometer, type and cost**, newest first. Tap a row to open it — the
   fields become editable and a notes box appears, sizing itself to fit however much you
   write and shrinking back as you delete. The date is a proper date picker, so back-filling
   a service from 2019 is a normal thing to do, not a fight.
@@ -235,7 +235,8 @@ All in `config.js`:
 | Setting | Does what |
 | --- | --- |
 | `SERVICE_TYPES` | The dropdown. Add or rename freely — anything in the file that isn't on the list falls back to the first entry |
-| `CURRENCY` | Formatting only, nothing is converted |
+| `CURRENCY_SYMBOL` | Pasted in front of every cost. Formatting only, nothing is converted |
+| `DISTANCE_UNIT` | Shown after odometer readings, and in the field label. Stored numbers are unitless, so changing this relabels history rather than converting it |
 | `THUMB_PX` / `PHOTO_PX` | Longest edge of the two generated JPEGs |
 | `JPEG_QUALITY` | 0–1. Raise it if photos look soft, at the cost of size |
 | `FOLDER_NAME` / `FILE_NAME` | Where it lives in Drive. Changing these after first run orphans the old folder |

@@ -122,22 +122,23 @@
     return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "2-digit" });
   }
 
+  // Plain decimal formatting with the symbol pasted on the front. Intl's
+  // currency mode drags the country prefix along — "CA$89", "US$89" — which is
+  // noise on a log where every number is in the same currency anyway.
   const moneyFmt = {};
   function fmtMoney(n) {
     if (n == null || !Number.isFinite(n)) return "—";
     // Whole amounts lose the ".00" — a log full of "$89.00" is just noise.
     const frac = Math.abs(n % 1) > 0.004 ? 2 : 0;
     moneyFmt[frac] ||= new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: cfg.CURRENCY,
       minimumFractionDigits: frac,
       maximumFractionDigits: frac,
     });
-    return moneyFmt[frac].format(n);
+    return cfg.CURRENCY_SYMBOL + moneyFmt[frac].format(n);
   }
 
-  const fmtMiles = (n) =>
-    n == null || !Number.isFinite(n) ? "" : `${n.toLocaleString()} mi`;
+  const fmtDistance = (n) =>
+    n == null || !Number.isFinite(n) ? "" : `${n.toLocaleString()} ${cfg.DISTANCE_UNIT}`;
 
   function vehicleName(v) {
     const s = [v.year, v.make, v.model].filter(Boolean).join(" ");
@@ -642,10 +643,10 @@
     const type = document.createElement("span");
     type.className = "rec-type";
     type.textContent = r.type;
-    const miles = document.createElement("span");
-    miles.className = "rec-miles";
-    miles.textContent = fmtMiles(r.mileage);
-    mid.append(type, document.createElement("br"), miles);
+    const dist = document.createElement("span");
+    dist.className = "rec-dist";
+    dist.textContent = fmtDistance(r.mileage);
+    mid.append(type, document.createElement("br"), dist);
 
     const cost = document.createElement("span");
     cost.className = "rec-cost";
@@ -675,7 +676,9 @@
       render();
     });
 
-    const milesIn = field(grid, "Mileage", "number", {
+    // "Mileage" would be a lie once the unit is km, and the label is the only
+    // place the unit appears while you're typing into the box.
+    const milesIn = field(grid, `Odometer (${cfg.DISTANCE_UNIT})`, "number", {
       value: r.mileage ?? "",
       min: "0",
       step: "1",

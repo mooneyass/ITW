@@ -361,7 +361,7 @@ textarea:focus-visible {
   text-overflow: ellipsis;
 }
 
-.rec-miles { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rec-dist { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .rec-cost {
   flex: none;
